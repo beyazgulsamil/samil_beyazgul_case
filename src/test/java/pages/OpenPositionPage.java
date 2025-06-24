@@ -3,16 +3,17 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import utilities.Utilities;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
-import static pickleib.web.driver.PickleibWebDriver.log;
-import static utils.StringUtilities.Color.*;
-import static utils.StringUtilities.highlighted;
 
 public class OpenPositionPage {
+    private static final Logger log = Logger.getLogger(Utilities.class.getName());
     WebDriver driver;
 
 
@@ -22,22 +23,37 @@ public class OpenPositionPage {
 
     }
 
-    public static By filterByLocation = By.cssSelector("#select2-filter-by-location-container");
-    public static By listLocation = By.cssSelector(".select2-results__option");
-    public static By qaTitle = By.cssSelector("[title=\"Quality Assurance\"]");
-    public static By positionList = By.cssSelector(".position-list");
-    public static By positionListItem = By.cssSelector(".position-list-item");
-    public static By listItemTeam = By.cssSelector("[data-team=\"qualityassurance\"]");
-    public static By viewRoleButton = By.xpath("(//div[contains(@class,'position-list-item')]//a[contains(@class,'btn-navy')])[1]");
+    @FindBy(css = "#select2-filter-by-location-container")
+    public WebElement filterByLocation;
+
+    @FindBy(css = ".select2-results__option")
+    public List<WebElement> listLocation;
+
+    @FindBy(css = ".select2-results__options")
+    public WebElement listLocations;
+
+    @FindBy(css = "[title=\"Quality Assurance\"]")
+    public WebElement qaTitle;
+
+    @FindBy(css = ".position-list")
+    public WebElement positionList;
+
+    @FindBy(css = "[data-team=\"qualityassurance\"]")
+    public List<WebElement> positionListItem;
+
+    @FindBy(css = "#select2-filter-by-location-container")
+    public WebElement listItemTeam;
+
+    @FindBy(xpath = "(//div[contains(@class,'position-list-item')]//a[contains(@class,'btn-navy')])[1]")
+    public WebElement viewRoleButton;
 
     public void verifyJobFilters(String expectedLocation, String expectedTeam) {
-        List<WebElement> jobCards = driver.findElements(positionListItem);
 
-        if (jobCards.isEmpty()) {
+        if (positionListItem.isEmpty()) {
             throw new NoSuchElementException("Position not found.");
         }
 
-        for (WebElement card : jobCards) {
+        for (WebElement card : positionListItem) {
             String actualLocation = card.getAttribute("data-location");
             String actualTeam = card.getAttribute("data-team");
 
@@ -49,10 +65,8 @@ public class OpenPositionPage {
                 throw new AssertionError("Invalid data-team: " + actualTeam);
             }
             String jobTitle = card.findElement(By.cssSelector(".position-title")).getText();
-            log.info(highlighted(BLUE, " MATCH ") +
-                    highlighted(YELLOW, jobTitle) + " | " +
-                    highlighted(PURPLE, actualLocation + " / " + actualTeam));
+            log.info(" MATCH " + jobTitle + " | " +actualLocation + " / " + actualTeam);
         }
-        log.info(highlighted(BLUE,"Successfully verify job filters:"));
+        log.info("Successfully verify job filters:");
     }
 }

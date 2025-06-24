@@ -23,18 +23,18 @@ public class Case extends Utilities {
     public void test() throws InterruptedException {
         // Step 1 - Visit https://useinsider.com/ and check Insider home page is opened or not
         go("https://useinsider.com/");
-        click(LandingPage.cookieAcceptButton, "Cookie Accept Button");
         landingPage = new LandingPage(driver);
-        waitUntilVisible(LandingPage.insiderLogo,10,"Insider Logo");
+        click(landingPage.cookieAcceptButtonTwo,"Cookie Accept Button");
+        waitUntilVisible(landingPage.insiderLogo,10,"Insider Logo");
 
         // Step 2 - Select the “Company” menu in the navigation bar, select “Careers” and check Career
         //page, its Locations, Teams, and Life at Insider blocks are open or not
         careersPage = new CareersPage(driver);
-        click(LandingPage.navBarCompany, "Company button");
+        click(landingPage.navBarCompany, "Company button");
         clickText("Careers");
-        waitUntilVisible(CareersPage.teamsArea,10,"Teams Area");
-        waitUntilVisible(CareersPage.locationsArea,10,"Locations Area");
-        waitUntilVisible(CareersPage.lifeAtInsiderArea,10,"Life at Insider Area");
+        waitUntilVisible(careersPage.teamsArea,10,"Teams Area");
+        waitUntilVisible(careersPage.locationsArea,10,"Locations Area");
+        waitUntilVisible(careersPage.lifeAtInsiderArea,10,"Life at Insider Area");
 
         //Step 3 - Go to https://useinsider.com/careers/quality-assurance/, click “See all QA jobs”, filter
         //jobs by Location: “Istanbul, Turkiye”, and Department: “Quality Assurance”, check the
@@ -42,20 +42,20 @@ public class Case extends Utilities {
         openPositionPage = new OpenPositionPage(driver);
         go("https://useinsider.com/careers/quality-assurance/");
         clickText("See all QA jobs");
-        waitUntilVisible(OpenPositionPage.qaTitle,10,"QA Title");
-        click(OpenPositionPage.filterByLocation, "Filter By Location");
-        waitUntilVisible(OpenPositionPage.listLocation,10,"List Location");
-        loopAndClick(OpenPositionPage.listLocation,"Istanbul, Turkiye");
+        waitUntilVisible(openPositionPage.qaTitle,10,"QA Title");
+        click(openPositionPage.filterByLocation, "Filter By Location");
+        waitUntilVisible(openPositionPage.listLocations,10,"List Location");
+        loopAndClick(openPositionPage.listLocation,"Istanbul, Turkiye");
 
         // Step 4 - Check that all jobs’ Position contains “Quality Assurance”, Department contains
         //“Quality Assurance”, and Location contains “Istanbul, Turkey”
-        scroll(waitUntilVisible(OpenPositionPage.positionList,10,"Position List"));
-        waitUntilVisible(OpenPositionPage.listItemTeam,10,"List Item Location");
+        scroll(waitUntilVisible(openPositionPage.positionList,10,"Position List"));
+        waitUntilVisible(openPositionPage.viewRoleButton,10,"View Role");
         openPositionPage.verifyJobFilters("istanbul-turkiye", "qualityassurance");
 
         // Step 5 -Click the “View Role” button and check that this action redirects us to the Lever
         //Application form page
-        click(mouseHover(OpenPositionPage.viewRoleButton,"View Role Button"),"View Role Button");
+        click(mouseHover(openPositionPage.viewRoleButton,"View Role Button"),"View Role Button");
         switchToNewTab();
         verifyUrlContains("jobs.lever.co/useinsider");
 

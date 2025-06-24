@@ -2,6 +2,8 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 
@@ -13,9 +15,13 @@ public class LandingPage {
         PageFactory.initElements(driver, this);
     }
 
-    public static By cookieAcceptButton = By.cssSelector(".wt-cli-accept-all-btn");
-    public static By insiderLogo = By.cssSelector("[alt='insider_logo']");
-    public static By navBarCompany = By.xpath("//a[contains(text(),'Company')]");
+    @FindBy(css = ".wt-cli-accept-all-btn")
+    public WebElement cookieAcceptButtonTwo;
 
+    @FindBy(css = "[alt='insider_logo']")
+    public WebElement insiderLogo;
+
+    @FindBy(xpath = "//a[contains(text(),'Company')]")
+    public WebElement navBarCompany;
 
 }

@@ -1,6 +1,7 @@
 package utilities;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -9,23 +10,20 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-import static pickleib.web.driver.PickleibWebDriver.log;
-import static utils.StringUtilities.Color.*;
-import static utils.StringUtilities.Color.BLUE;
-import static utils.StringUtilities.highlighted;
+import java.util.logging.Logger;
+
 
 public class Utilities {
-    protected WebDriver driver;
+    private static final Logger log = Logger.getLogger(Utilities.class.getName());
 
+    protected WebDriver driver;
 
     public void initialize() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        log.info(highlighted(GREEN_UNDERLINED,"Initialized:") + highlighted(PURPLE," Driver"));
-
+        log.info("Initialized:" +" Driver");
     }
 
     public void kill() {
@@ -36,64 +34,56 @@ public class Utilities {
 
     public void go (String url) {
         driver.get(url);
-        log.info(highlighted(BLUE,"Go to: ") + highlighted(YELLOW,url));
+        log.info("Go to: " + url);
     }
 
-    public By scroll(By by) {
-        WebElement element = driver.findElement(by);
+    public WebElement scroll(WebElement element) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         String scrollElementIntoMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
                 + "var elementTop = arguments[0].getBoundingClientRect().top;"
                 + "window.scrollBy(0, elementTop-(viewPortHeight/2));";
 
         js.executeScript(scrollElementIntoMiddle, element);
-        log.info(highlighted(BLUE,"Scrolling"));
-        return by;
+        log.info("Scrolling");
+        return element;
     }
 
-    public By waitUntilVisible(By by, int timeout, String name) {
+    public WebElement waitUntilVisible(WebElement element, int timeout, String name) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(by));
-        log.info(highlighted(BLUE,"Wait to visible for ") + highlighted(YELLOW,name));
-        return by;
+        wait.until(ExpectedConditions.visibilityOf(element));
+        log.info("Wait to visible for " + name);
+        return element;
     }
 
-    public void click(By by, String name) {
-        driver.findElement(scroll(waitUntilVisible(by, 10,name))).click();
-        log.info(highlighted(BLUE,"Click to: ") + highlighted(YELLOW,name));
+    public void click(WebElement element, String name) {
+        scroll(waitUntilVisible(element, 10,name)).click();
+        log.info("Click to: " + name);
     }
 
     public void clickText(String text) {
-        By by = By.xpath("//*[contains(text(),'" + text + "')]");
-        click(by,text);
+        WebElement element = driver.findElement(By.xpath("//*[contains(text(),'" + text + "')]"));
+        click(element,text);
     }
 
-    public void loopAndClick(By listLocator, String textToClick) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        List<WebElement> elements = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(listLocator));
-
-        for (WebElement element : elements) {
-            String visibleText = element.getText().trim();
-            if (visibleText.equalsIgnoreCase(textToClick)) {
-                scroll(By.xpath("//*[text()='" + visibleText + "']"));
-                wait.until(ExpectedConditions.elementToBeClickable(element)).click();
+    public void loopAndClick(List<WebElement> list, String buttonName){
+        for (WebElement item:list) {
+            if (item.getText().contains(buttonName)){
+                click(item,buttonName);
                 return;
             }
         }
-
-        throw new NoSuchElementException("Text '" + textToClick + "' is not equals");
+        Assert.fail("No such element was found...");
     }
 
-    public By mouseHover(By by, String name) {
+    public WebElement mouseHover(WebElement element, String name) {
         try {
-            WebElement element = driver.findElement(by);
             Actions actions = new Actions(driver);
             actions.moveToElement(element).perform();
 
-            log.info(highlighted(BLUE, "Mouse hover on: ") + highlighted(YELLOW, name));
-            return by;
+            log.info("Mouse hover on: "+ name);
+            return element;
         } catch (Exception e) {
-            log.error("Mouse hover failed for element: " + name, e);
+            log.warning("Mouse hover failed for element: " + name);
             throw e;
         }
     }
@@ -107,6 +97,7 @@ public class Utilities {
 
         log.info(" URL in '" + expectedPart + "' found.");
     }
+
     public void switchToNewTab() {
         String currentWindow = driver.getWindowHandle();
         for (String windowHandle : driver.getWindowHandles()) {

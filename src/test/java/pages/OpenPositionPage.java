@@ -4,23 +4,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import utilities.Utilities;
-
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 
-
-public class OpenPositionPage {
-    private static final Logger log = Logger.getLogger(Utilities.class.getName());
-    WebDriver driver;
-
+public class OpenPositionPage extends PageObject {
 
     public OpenPositionPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
-
+        super(driver);
     }
 
     @FindBy(css = "#select2-filter-by-location-container")
@@ -40,9 +30,6 @@ public class OpenPositionPage {
 
     @FindBy(css = "[data-team=\"qualityassurance\"]")
     public List<WebElement> positionListItem;
-
-    @FindBy(css = "#select2-filter-by-location-container")
-    public WebElement listItemTeam;
 
     @FindBy(xpath = "(//div[contains(@class,'position-list-item')]//a[contains(@class,'btn-navy')])[1]")
     public WebElement viewRoleButton;

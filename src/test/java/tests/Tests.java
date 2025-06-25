@@ -1,26 +1,27 @@
 package tests;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import pages.CareersPage;
 import pages.LandingPage;
 import pages.OpenPositionPage;
 import utilities.Utilities;
 
-public class Case extends Utilities {
+public class Tests extends Utilities {
 
     LandingPage landingPage;
     CareersPage careersPage;
     OpenPositionPage openPositionPage;
 
-    @BeforeMethod
+    @Before
     public void before() {
         initialize();
     }
 
     @Test
-    public void test() throws InterruptedException {
+    public void test(){
+
         // Step 1 - Visit https://useinsider.com/ and check Insider home page is opened or not
         go("https://useinsider.com/");
         landingPage = new LandingPage(driver);
@@ -31,7 +32,7 @@ public class Case extends Utilities {
         //page, its Locations, Teams, and Life at Insider blocks are open or not
         careersPage = new CareersPage(driver);
         click(landingPage.navBarCompany, "Company button");
-        clickText("Careers");
+        click(textToElement("Careers"),"Careers");
         waitUntilVisible(careersPage.teamsArea,10,"Teams Area");
         waitUntilVisible(careersPage.locationsArea,10,"Locations Area");
         waitUntilVisible(careersPage.lifeAtInsiderArea,10,"Life at Insider Area");
@@ -41,7 +42,7 @@ public class Case extends Utilities {
         //presence of the jobs list
         openPositionPage = new OpenPositionPage(driver);
         go("https://useinsider.com/careers/quality-assurance/");
-        clickText("See all QA jobs");
+        click(textToElement("See all QA jobs"),"See all QA jobs");
         waitUntilVisible(openPositionPage.qaTitle,10,"QA Title");
         click(openPositionPage.filterByLocation, "Filter By Location");
         waitUntilVisible(openPositionPage.listLocations,10,"List Location");
@@ -56,14 +57,14 @@ public class Case extends Utilities {
         // Step 5 -Click the “View Role” button and check that this action redirects us to the Lever
         //Application form page
         click(mouseHover(openPositionPage.viewRoleButton,"View Role Button"),"View Role Button");
-        switchToNewTab();
+        switchToTheNextTab();
         verifyUrlContains("jobs.lever.co/useinsider");
 
     }
 
 
-    @AfterMethod
-    public void after() {
+    @After
+    public void after(){ takeScreenshot(driver, "end.png");
         kill();
     }
 }

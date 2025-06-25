@@ -1,6 +1,5 @@
 package utilities;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -8,7 +7,12 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 
 import java.util.logging.Logger;
@@ -20,15 +24,35 @@ public class Utilities {
     protected WebDriver driver;
 
     public void initialize() {
-        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        log.info("Initialized:" +" Driver");
+        log.info("Initialized: Chrome Driver");
     }
 
     public void kill() {
         if (driver != null) {
             driver.quit();
+        }
+    }
+
+    public void takeScreenshot(WebDriver driver, String name) {
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = name + "_" + timestamp + ".png";
+        String directory = "screenshots";
+
+        try {
+            File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File dest = new File(directory + "/" + fileName);
+
+            if (!dest.getParentFile().exists()) {
+                dest.getParentFile().mkdirs();
+            }
+
+            Files.copy(src.toPath(), dest.toPath());
+            log.info("Screenshot alındı: " + dest.getPath());
+
+        } catch (IOException e) {
+            log.severe("Screenshot alınamadı: " + e.getMessage());
         }
     }
 
@@ -48,11 +72,15 @@ public class Utilities {
         return element;
     }
 
-    public WebElement waitUntilVisible(WebElement element, int timeout, String name) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
-        wait.until(ExpectedConditions.visibilityOf(element));
-        log.info("Wait to visible for " + name);
-        return element;
+    public WebElement waitUntilVisible(WebElement element, int timeoutSec, String name) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSec));
+        try {
+            wait.until(ExpectedConditions.visibilityOf(element));
+            log.info("Visible: " + name);
+            return element;
+        } catch (TimeoutException e) {
+            throw new TimeoutException("Element NOT visible after " + timeoutSec + " s → " + name, e);
+        }
     }
 
     public void click(WebElement element, String name) {
@@ -60,9 +88,8 @@ public class Utilities {
         log.info("Click to: " + name);
     }
 
-    public void clickText(String text) {
-        WebElement element = driver.findElement(By.xpath("//*[contains(text(),'" + text + "')]"));
-        click(element,text);
+    public WebElement textToElement(String text) {
+        return driver.findElement(By.xpath("//*[contains(text(),'" + text + "')]"));
     }
 
     public void loopAndClick(List<WebElement> list, String buttonName){
@@ -94,11 +121,10 @@ public class Utilities {
         if (!actualUrl.contains(expectedPart)) {
             throw new AssertionError("URL '" + actualUrl + "' in '" + expectedPart + "' not found!");
         }
-
         log.info(" URL in '" + expectedPart + "' found.");
     }
 
-    public void switchToNewTab() {
+    public void switchToTheNextTab() {
         String currentWindow = driver.getWindowHandle();
         for (String windowHandle : driver.getWindowHandles()) {
             if (!windowHandle.equals(currentWindow)) {
@@ -109,7 +135,5 @@ public class Utilities {
         }
         throw new RuntimeException("Tab change failed.");
     }
-
-
 
 }

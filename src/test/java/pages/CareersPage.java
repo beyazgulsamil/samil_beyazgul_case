@@ -1,20 +1,16 @@
 package pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
-public class CareersPage {
-    WebDriver driver;
+public class CareersPage extends PageObject {
 
     public CareersPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
-    @FindBy(xpath = "//*[@id=\"career-find-our-calling\"]/div/div/a")
+    @FindBy(css = ".career-load-more")
     public WebElement teamsArea;
 
     @FindBy(css = "#career-our-location")

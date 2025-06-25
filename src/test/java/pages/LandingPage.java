@@ -1,18 +1,13 @@
 package pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
-
-public class LandingPage {
-    WebDriver driver;
+public class LandingPage extends PageObject{
 
     public LandingPage(WebDriver driver) {
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     @FindBy(css = ".wt-cli-accept-all-btn")
@@ -21,7 +16,7 @@ public class LandingPage {
     @FindBy(css = "[alt='insider_logo']")
     public WebElement insiderLogo;
 
-    @FindBy(xpath = "//a[contains(text(),'Company')]")
+    @FindBy(css = "li:nth-child(6) a#navbarDropdownMenuLink")
     public WebElement navBarCompany;
 
 }
